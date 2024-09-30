@@ -24,7 +24,7 @@ const BusinessProfile = () => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/business/${businessId}`, {
+        const response = await axios.get(`https://imbentaryo-hub.onrender.com/api/business/${businessId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

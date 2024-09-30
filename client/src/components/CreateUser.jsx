@@ -6,7 +6,7 @@ import Footer from './Footer';
 // Function to create a new user with JWT token in the Authorization header
 const createUser = async (newUserData, token) => {
   try {
-    const response = await axios.post('http://localhost:5000/api/auth/create-user', newUserData, {
+    const response = await axios.post('https://imbentaryo-hub.onrender.com/api/auth/create-user', newUserData, {
       headers: {
         'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
       },

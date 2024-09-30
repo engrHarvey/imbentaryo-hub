@@ -13,7 +13,7 @@ function DonutChart() {
     const fetchCategoryData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/item', {
+        const response = await axios.get('https://imbentaryo-hub.onrender.com/api/item', {
           headers: { Authorization: `Bearer ${token}` },
         });
 

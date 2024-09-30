@@ -12,7 +12,7 @@ function Logs() {
     const fetchLogs = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/logs', {
+        const response = await axios.get('https://imbentaryo-hub.onrender.com/api/logs', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setLogs(response.data.logs);

@@ -18,7 +18,7 @@ function AddItem() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/categories');
+        const response = await axios.get('https://imbentaryo-hub.onrender.com/api/categories');
         setCategories(response.data.categories);
       } catch (error) {
         console.error('Failed to fetch categories:', error);
@@ -30,7 +30,7 @@ function AddItem() {
   // Handle image search using the item name
   const handleSearchImages = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/images/search-images?query=${name}`);
+      const response = await axios.get(`https://imbentaryo-hub.onrender.com/api/images/search-images?query=${name}`);
       setImageResults(response.data.images); // Store the fetched images
     } catch (error) {
       alert('Failed to search images: ' + error.message);
@@ -49,7 +49,7 @@ function AddItem() {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/item/add-item',
+        'https://imbentaryo-hub.onrender.com/api/item/add-item',
         {
           name,
           category,

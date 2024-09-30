@@ -13,7 +13,7 @@ function BarChart() {
     const fetchInventoryData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/logs/inventory', {
+        const response = await axios.get('https://imbentaryo-hub.onrender.com/api/logs/inventory', {
           headers: { Authorization: `Bearer ${token}` },
         });
 

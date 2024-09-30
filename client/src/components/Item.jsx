@@ -18,7 +18,7 @@ function Item({ item, onQuantityChange }) {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/item/update-item',
+        'https://imbentaryo-hub.onrender.com/api/item/update-item',
         { itemId: item._id, action: 'added', quantity: quantityToUpdate },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -38,7 +38,7 @@ function Item({ item, onQuantityChange }) {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/item/update-item',
+        'https://imbentaryo-hub.onrender.com/api/item/update-item',
         { itemId: item._id, action: subtractAction, quantity: quantityToUpdate },
         { headers: { Authorization: `Bearer ${token}` } }
       );

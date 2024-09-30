@@ -13,7 +13,7 @@ function LineChart() {
     const fetchSalesData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/logs/sales', {
+        const response = await axios.get('https://imbentaryo-hub.onrender.com/api/logs/sales', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
