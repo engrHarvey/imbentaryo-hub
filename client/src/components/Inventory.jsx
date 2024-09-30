@@ -11,6 +11,7 @@ import { isUserLoggedIn } from '../utils/helpers';
 const Inventory = () => {
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [businessName, setBusinessName] = useState(''); // State to store the business name
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   // Fetch items from backend
@@ -23,12 +24,37 @@ const Inventory = () => {
       setItems(response.data.items);
       setFilteredItems(response.data.items);
     } catch (error) {
-      alert('Failed to fetch items: ' + error.response.data.message);
+      alert('Failed to fetch items: ' + error.response?.data?.message);
     }
   };
 
+  // Fetch business details to get the business name
+const fetchBusinessDetails = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    const businessId = user?.business?._id;
+
+    if (!businessId) {
+      console.error('Business ID is missing. Please log in again.');
+      return;
+    }
+
+    const response = await axios.get(`http://localhost:5000/api/business/${businessId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (response.data && response.data.business && response.data.business.name) {
+      setBusinessName(response.data.business.name); // Corrected to access business name correctly
+    }
+  } catch (error) {
+    console.error('Failed to fetch business details:', error);
+  }
+};
+
   useEffect(() => {
     fetchItems(); // Fetch items on component mount
+    fetchBusinessDetails(); // Fetch business details on component mount
   }, []);
 
   // Handle search input
@@ -101,7 +127,8 @@ const Inventory = () => {
         {/* Main Inventory Section */}
         <div className="flex-grow bg-white rounded-lg shadow-lg p-8 ml-6">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-4xl font-bold text-blue-700">Inventory</h1>
+            {/* Dynamic Business Name in the Inventory Title */}
+            <h1 className="text-4xl font-bold text-blue-700">{businessName} Inventory</h1>
             <button
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500 transition-all duration-200 shadow-md"
               onClick={() => setIsModalVisible(true)}

@@ -10,6 +10,7 @@ const logsSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to the User who performed the action
   username: { type: String, required: true }, // Username of the person who performed the action
   actionType: { type: String, enum: ['icon', 'manual', 'initial'], required: true }, // Action source type
+  business: { type: mongoose.Schema.Types.ObjectId, ref: 'Business', required: true }, // Reference to the Business
 });
 
 const Logs = mongoose.model('Logs', logsSchema);

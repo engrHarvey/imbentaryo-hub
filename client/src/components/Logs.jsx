@@ -33,6 +33,34 @@ function Logs() {
     );
   }
 
+  // Function to determine the text color for the action column
+  const getActionColor = (action) => {
+    switch (action) {
+      case 'added':
+        return 'text-green-600 font-semibold';
+      case 'removed':
+        return 'text-red-600 font-semibold';
+      case 'sold':
+        return 'text-yellow-600 font-semibold';
+      default:
+        return '';
+    }
+  };
+
+  // Function to determine the text color for the user type column
+  const getUserTypeColor = (userType) => {
+    switch (userType) {
+      case 'owner':
+        return 'text-purple-600 font-bold';
+      case 'sub-owner':
+        return 'text-blue-600 font-bold';
+      case 'employee':
+        return 'text-gray-600 font-semibold';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Fixed Header */}
@@ -57,19 +85,24 @@ function Logs() {
                 <th className="px-6 py-3 font-medium border-b border-gray-200">Action</th>
                 <th className="px-6 py-3 font-medium border-b border-gray-200">Quantity</th>
                 <th className="px-6 py-3 font-medium border-b border-gray-200">User</th>
+                <th className="px-6 py-3 font-medium border-b border-gray-200">User Type</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {logs.map((log) => (
-                <tr
-                  key={log._id}
-                  className="hover:bg-blue-50 transition-colors duration-200"
-                >
+                <tr key={log._id} className="hover:bg-blue-50 transition-colors duration-200">
                   <td className="px-6 py-4 border-b border-gray-200">{new Date(log.date).toLocaleString()}</td>
                   <td className="px-6 py-4 border-b border-gray-200">{log.itemName}</td>
-                  <td className="px-6 py-4 border-b border-gray-200 capitalize">{log.action}</td>
+                  {/* Action Column with Dynamic Color */}
+                  <td className={`px-6 py-4 border-b border-gray-200 capitalize ${getActionColor(log.action)}`}>
+                    {log.action}
+                  </td>
                   <td className="px-6 py-4 border-b border-gray-200">{log.quantity}</td>
                   <td className="px-6 py-4 border-b border-gray-200">{log.username}</td>
+                  {/* User Type Column with Dynamic Color */}
+                  <td className={`px-6 py-4 border-b border-gray-200 ${getUserTypeColor(log.user?.userType)}`}>
+                    {log.user?.userType || 'N/A'}
+                  </td>
                 </tr>
               ))}
             </tbody>

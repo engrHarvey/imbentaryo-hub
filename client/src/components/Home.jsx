@@ -1,12 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DonutChart from '../components/DonutChart';
 import LineChart from '../components/LineChart';
 import BarChart from '../components/BarChart';
 import CategoryMonthlySalesChart from '../components/CategoryMonthlySalesChart';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import axios from 'axios';
 
 function Home() {
+  const [businessName, setBusinessName] = useState(''); // State to store the business name
+
+  // Fetch business details to get the business name
+  const fetchBusinessDetails = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      const businessId = user?.business?._id;
+
+      if (!businessId) {
+        console.error('Business ID is missing. Please log in again.');
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:5000/api/business/${businessId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data && response.data.business && response.data.business.name) {
+        setBusinessName(response.data.business.name); // Corrected to access business name correctly
+      }
+    } catch (error) {
+      console.error('Failed to fetch business details:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusinessDetails(); // Fetch business details on component mount
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex flex-col">
       {/* Fixed Header */}
@@ -17,7 +48,8 @@ function Home() {
       {/* Main Dashboard Content */}
       <div className="flex-grow mt-24 mb-16 px-8">
         <div className="bg-white shadow-md rounded-lg p-6 mb-8 text-center">
-          <h1 className="text-5xl font-bold text-blue-700 mb-2">Business Dashboard</h1>
+          {/* Use dynamic business name here */}
+          <h1 className="text-5xl font-bold text-blue-700 mb-2">{businessName} Dashboard</h1>
           <p className="text-lg text-gray-600">Overview of sales, inventory, and performance metrics</p>
         </div>
 
@@ -33,7 +65,7 @@ function Home() {
             <LineChart />
           </div>
 
-          {/* Bar Chart for Monthly Inventory Changes - Modified to Increase Width */}
+          {/* Bar Chart for Monthly Inventory Changes */}
           <div className="lg:col-span-2 md:col-span-2 col-span-1 h-full">
             <BarChart />
           </div>

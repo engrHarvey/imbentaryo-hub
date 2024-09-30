@@ -7,7 +7,8 @@ import CreateUser from './components/CreateUser';
 import AddItem from './components/AddItem';
 import Inventory from './components/Inventory';
 import Logs from './components/Logs';
-import LandingPage from './components/LandingPage'; // Import LandingPage component
+import LandingPage from './components/LandingPage';
+import BusinessProfile from './components/BusinessProfile'; // Import the BusinessProfile component
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -57,6 +58,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Logs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/business-profile"
+          element={
+            <ProtectedRoute>
+              <BusinessProfile />
             </ProtectedRoute>
           }
         />

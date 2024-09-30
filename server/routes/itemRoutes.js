@@ -19,10 +19,29 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Route to get all items
+// Middleware to validate business access for items
+const validateBusinessAccess = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ username: req.user.username }).populate('business');
+    if (!user || !user.business) {
+      return res.status(403).json({ message: 'You are not associated with any business' });
+    }
+
+    req.businessId = user.business._id;
+    next();
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Route to get all items for a specific business
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const items = await Item.find().populate('addedBy');
+    const user = await User.findOne({ username: req.user.username }).populate('business');
+    if (!user) return res.status(403).json({ message: 'User not found' });
+
+    // Filter items by the business of the user
+    const items = await Item.find({ business: user.business._id }).populate('addedBy');
     res.json({ items });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch items', error: error.message });
@@ -30,18 +49,21 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // Route to add a new item
-router.post('/add-item', authenticateToken, async (req, res) => {
+router.post('/add-item', authenticateToken, validateBusinessAccess, async (req, res) => {
   const { name, category, subCategory, value, quantity, brand, expirationDate, currency, image } = req.body;
 
-  if (!name || !category || quantity == null || value == null) {
-    return res.status(400).json({ message: 'Missing required fields. Please provide name, category, value, and quantity.' });
+  // Check required fields
+  if (!name || !category || !subCategory || quantity == null || value == null) {
+    return res.status(400).json({ 
+      message: 'Missing required fields. Please provide name, category, subCategory, value, and quantity.' 
+    });
   }
 
   try {
     const user = await User.findOne({ username: req.user.username }).populate('business');
     if (!user) return res.status(403).json({ message: 'User not found' });
 
-    // Create a new item
+    // Create a new item for the business
     const newItem = await Item.create({
       name,
       category,
@@ -52,11 +74,11 @@ router.post('/add-item', authenticateToken, async (req, res) => {
       brand,
       expirationDate,
       image,
-      business: user.business._id,
+      business: user.business._id, // Link item to the business
       addedBy: user._id,
     });
 
-    // Create a new log entry for item creation
+    // Create a log for item creation
     await Logs.create({
       itemName: name,
       action: 'added',
@@ -64,7 +86,8 @@ router.post('/add-item', authenticateToken, async (req, res) => {
       item: newItem._id,
       user: user._id,
       username: user.username,
-      actionType: 'initial', // Mark this log as the initial creation
+      actionType: 'initial',
+      business: user.business._id // Associate log with the business
     });
 
     res.json({ message: 'Item added successfully and log created', item: newItem });
@@ -73,20 +96,26 @@ router.post('/add-item', authenticateToken, async (req, res) => {
   }
 });
 
-// Route to update the quantity of an item (for add, remove, or sold actions)
-router.post('/update-item', authenticateToken, async (req, res) => {
+// Route to update the quantity of an item
+router.post('/update-item', authenticateToken, validateBusinessAccess, async (req, res) => {
   const { itemId, action, quantity } = req.body;
 
+  // Validate request body
   if (!itemId || !action || quantity == null) {
     return res.status(400).json({ message: 'Invalid request data. Please provide itemId, action, and quantity.' });
   }
 
   try {
-    const item = await Item.findById(itemId);
+    const item = await Item.findById(itemId).populate('business');
     const user = await User.findOne({ username: req.user.username });
 
     if (!item) {
       return res.status(404).json({ message: 'Item not found' });
+    }
+
+    // Check if the item belongs to the user's business
+    if (user.business.toString() !== item.business._id.toString()) {
+      return res.status(403).json({ message: 'You are not authorized to modify this item' });
     }
 
     // Update item quantity based on action
@@ -112,7 +141,8 @@ router.post('/update-item', authenticateToken, async (req, res) => {
       item: item._id,
       user: user._id,
       username: user.username,
-      actionType: 'icon', // Action type is set to 'icon' as this is triggered by icons
+      actionType: 'icon',
+      business: user.business._id // Associate log with the business
     });
 
     res.json({ message: `Item ${action} successfully and log created`, item });

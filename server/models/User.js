@@ -8,7 +8,11 @@ const userSchema = new mongoose.Schema({
   address: { type: String, required: true },
   contactNumber: { type: String, required: true },
   password: { type: String, required: true },
-  userType: { type: String, default: 'owner', enum: ['owner', 'sub-owner', 'employee'] },
+  userType: { 
+    type: String, 
+    default: 'owner', 
+    enum: ['owner', 'sub-owner', 'employee'] 
+  },
   business: { type: mongoose.Schema.Types.ObjectId, ref: 'Business' }, // Reference to the Business
 });
 

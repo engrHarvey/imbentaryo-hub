@@ -3,6 +3,22 @@ import axios from 'axios';
 import Header from './Header';
 import Footer from './Footer';
 
+// Function to create a new user with JWT token in the Authorization header
+const createUser = async (newUserData, token) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/create-user', newUserData, {
+      headers: {
+        'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
+      },
+    });
+    console.log('User created successfully:', response.data);
+    alert('User created successfully');
+  } catch (error) {
+    console.error('User creation failed:', error.response ? error.response.data : error.message);
+    alert('User creation failed: ' + (error.response ? error.response.data.message : error.message));
+  }
+};
+
 function CreateUser() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -11,29 +27,51 @@ function CreateUser() {
   const [address, setAddress] = useState('');
   const [contactNumber, setContactNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState(''); // New state for repeat password
   const [userType, setUserType] = useState('employee'); // Default user type
 
-  const business = JSON.parse(localStorage.getItem('user')).business;
+  // Retrieve the token and business information from local storage
+  const token = localStorage.getItem('token');
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const business = userData ? userData.business : null;
 
   const handleCreateUser = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/auth/create-user', {
-        token,
-        firstName,
-        lastName,
-        username,
-        email,
-        address,
-        contactNumber,
-        password,
-        userType,
-        businessId: business._id,
-      });
-      alert('User created successfully');
-    } catch (error) {
-      alert('User creation failed: ' + error.response.data.message);
+    if (!token || !business) {
+      alert('Token or business information is missing. Please log in again.');
+      return;
     }
+
+    if (password !== repeatPassword) {
+      alert('Passwords do not match. Please re-enter.');
+      return;
+    }
+
+    // Prepare the data for the new user
+    const newUserData = {
+      firstName,
+      lastName,
+      username,
+      email,
+      address,
+      contactNumber,
+      password,
+      userType,
+      businessId: business._id, // Include business ID in the payload
+    };
+
+    // Use the createUser function with the Authorization header
+    await createUser(newUserData, token);
+
+    // Clear form after successful creation
+    setFirstName('');
+    setLastName('');
+    setUsername('');
+    setEmail('');
+    setAddress('');
+    setContactNumber('');
+    setPassword('');
+    setRepeatPassword(''); // Clear repeat password as well
+    setUserType('employee');
   };
 
   return (
@@ -56,6 +94,7 @@ function CreateUser() {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
             <input
               type="text"
@@ -63,6 +102,7 @@ function CreateUser() {
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
             <input
               type="text"
@@ -70,6 +110,7 @@ function CreateUser() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
             <input
               type="email"
@@ -77,6 +118,7 @@ function CreateUser() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
             <input
               type="text"
@@ -84,6 +126,7 @@ function CreateUser() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
             <input
               type="text"
@@ -91,6 +134,7 @@ function CreateUser() {
               value={contactNumber}
               onChange={(e) => setContactNumber(e.target.value)}
               className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
             <input
               type="password"
@@ -98,6 +142,15 @@ function CreateUser() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Repeat Password"
+              value={repeatPassword}
+              onChange={(e) => setRepeatPassword(e.target.value)}
+              className="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              required
             />
             <select
               value={userType}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaHome, FaUserPlus, FaBoxes, FaClipboardList, FaSignOutAlt } from 'react-icons/fa'; // FontAwesome icons for navigation
+import { FaHome, FaUserPlus, FaBoxes, FaClipboardList, FaSignOutAlt, FaBuilding } from 'react-icons/fa'; // Import FaBuilding for Business Profile icon
 
 const Header = () => {
   const navigate = useNavigate();
@@ -43,6 +43,13 @@ const Header = () => {
           >
             <FaBoxes className="text-xl" />
             <span>Inventory</span>
+          </button>
+          <button
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-blue-500 transition-all duration-200"
+            onClick={() => navigate('/business-profile')}
+          >
+            <FaBuilding className="text-xl" />
+            <span>Business Profile</span>
           </button>
           <button
             className="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-blue-500 transition-all duration-200"
