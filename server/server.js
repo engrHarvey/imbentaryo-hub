@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: 'https://imbentaryo-7pi4kgk04-harveys-projects-ef469158.vercel.app', // Replace this with your frontend URL
+  origin: 'https://imbentaryo-hub.vercel.app', // Replace this with your frontend URL
   credentials: true // Allow credentials to be included in requests
 }));
 app.use(express.json());
