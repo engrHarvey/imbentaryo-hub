@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path'); // Import the path module to handle file paths
 require('dotenv').config();
 
 const authRoutes = require('./routes/authRoutes');
@@ -32,6 +33,14 @@ app.use('/api/images', imageRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/business', businessRoutes);
+
+// Serve static files from the React frontend app located in "client/build"
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+// Catch-all route that sends the frontend's index.html for any unknown route
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+});
 
 // Start the server
 app.listen(PORT, () => {
